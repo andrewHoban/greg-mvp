@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Assistant - PoC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .plan-card {
+            background-color: #f8fafc; /* A very light blue/gray */
+            border-left: 4px solid #3b82f6; /* Blue-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">AI Data Assistant</h1>
+            <p class="text-md text-gray-600 mt-2">Phase 1: Proof of Concept</p>
+        </header>
+
+        <main class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            <!-- Step 1: User Input -->
+            <div id="user-input-container" class="mb-6">
+                <label for="natural-language-query" class="block text-lg font-semibold mb-2 text-gray-700">Ask a question about your data:</label>
+                <p class="text-sm text-gray-500 mb-3">This demo uses a sample `users` table. Try asking: <span class="font-mono bg-gray-100 p-1 rounded-md">"How many users signed up from the USA last month?"</span></p>
+                <textarea id="natural-language-query" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., What was the total revenue last quarter?"></textarea>
+                <button id="generate-plan-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-[1.02] active:scale-[0.98]">
+                    Generate Plan
+                </button>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loading-spinner" class="hidden flex-col items-center justify-center my-8">
+                <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+                <p id="loading-text" class="mt-4 text-gray-600 font-medium">Generating plan...</p>
+            </div>
+
+            <!-- Step 2: Plan Review -->
+            <div id="plan-review-container" class="hidden">
+                <h2 class="text-xl font-semibold mb-3 text-gray-800">Please review the execution plan:</h2>
+                <div class="space-y-4">
+                    <div class="plan-card p-4 rounded-lg">
+                        <h3 class="font-bold text-gray-700">Query Logic</h3>
+                        <p id="plan-logic" class="mt-1 text-gray-600"></p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="plan-card p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-700">Dataset</h3>
+                            <p id="plan-dataset" class="mt-1 font-mono text-sm bg-gray-200 inline-block px-2 py-1 rounded"></p>
+                        </div>
+                        <div class="plan-card p-4 rounded-lg col-span-2">
+                            <h3 class="font-bold text-gray-700">Fields Used</h3>
+                            <div id="plan-fields-used" class="mt-1 flex flex-wrap gap-1"></div>
+                        </div>
+                    </div>
+                     <div class="plan-card p-4 rounded-lg">
+                        <h3 class="font-bold text-gray-700">Other Potentially Relevant Fields</h3>
+                        <div id="plan-other-fields" class="mt-1 flex flex-wrap gap-1"></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-700">Generated SQL (for reference)</h3>
+                    <div class="bg-gray-900 text-white p-4 rounded-lg font-mono text-sm relative mt-2">
+                         <pre><code id="sql-output"></code></pre>
+                         <button id="copy-sql-btn" class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded">Copy</button>
+                    </div>
+                     <p id="copy-feedback" class="text-green-600 text-sm mt-2 hidden">Copied to clipboard!</p>
+                </div>
+                <div class="mt-6 flex flex-col md:flex-row gap-3">
+                    <button id="execute-btn" class="w-full md:w-auto bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition">Looks Good, Get Answer</button>
+                    <button id="cancel-btn" class="w-full md:w-auto bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition">Start Over</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Display Results -->
+            <div id="results-output-container" class="hidden mt-8">
+                <h2 class="text-xl font-semibold mb-3 text-gray-800">Query Results (Mock Data)</h2>
+                <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50" id="results-header"></thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="results-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="text-center mt-8 text-sm text-gray-500">
+            <p>This is a Proof of Concept. The SQL is generated by an AI and the data below is for demonstration only.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const apiKey = ""; 
+
+        const tableSchema = `
+            TABLE NAME: users
+            COLUMNS:
+            - user_id (INTEGER, PRIMARY KEY): Unique identifier for the user.
+            - email (STRING): The user's email address.
+            - country_code (STRING): Two-letter country code (e.g., 'USA', 'GBR', 'CAN').
+            - signup_date (TIMESTAMP): The exact date and time the user signed up.
+            - last_login (TIMESTAMP): The last time the user logged in.
+        `;
+
+        const mockData = {
+            headers: ["user_id", "email", "country_code", "signup_date"],
+            rows: [
+                [101, "alice@example.com", "USA", "2024-06-15T10:30:00Z"],
+                [102, "bob@example.com", "CAN", "2024-06-18T14:00:00Z"],
+                [103, "carol@example.com", "USA", "2024-06-22T09:00:00Z"],
+                [104, "dave@example.com", "GBR", "2024-07-01T11:45:00Z"],
+                [105, "eve@example.com", "USA", "2024-07-05T18:20:00Z"],
+            ]
+        };
+
+        // --- ELEMENT REFERENCES ---
+        const generatePlanBtn = document.getElementById('generate-plan-btn');
+        const queryInput = document.getElementById('natural-language-query');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const loadingText = document.getElementById('loading-text');
+        
+        const planReviewContainer = document.getElementById('plan-review-container');
+        const planLogic = document.getElementById('plan-logic');
+        const planDataset = document.getElementById('plan-dataset');
+        const planFieldsUsed = document.getElementById('plan-fields-used');
+        const planOtherFields = document.getElementById('plan-other-fields');
+        const sqlOutput = document.getElementById('sql-output');
+        const copySqlBtn = document.getElementById('copy-sql-btn');
+        const copyFeedback = document.getElementById('copy-feedback');
+        const executeBtn = document.getElementById('execute-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+        const resultsOutputContainer = document.getElementById('results-output-container');
+        const resultsHeader = document.getElementById('results-header');
+        const resultsBody = document.getElementById('results-body');
+        const userInputContainer = document.getElementById('user-input-container');
+
+        // --- EVENT LISTENERS ---
+        generatePlanBtn.addEventListener('click', handleGeneratePlanClick);
+        copySqlBtn.addEventListener('click', copySqlToClipboard);
+        executeBtn.addEventListener('click', handleExecuteClick);
+        cancelBtn.addEventListener('click', handleCancelClick);
+
+        // --- FUNCTIONS ---
+
+        /**
+         * Main entry point when user clicks "Generate Plan".
+         */
+        async function handleGeneratePlanClick() {
+            const userQuery = queryInput.value.trim();
+            if (!userQuery) {
+                alert("Please enter a question first.");
+                return;
+            }
+            
+            resetUI();
+            setLoading(true, "Generating SQL with AI...");
+
+            try {
+                const generatedSql = await generateSqlFromPrompt(userQuery);
+                sqlOutput.textContent = generatedSql; // Store SQL for later
+                
+                setLoading(true, "Analyzing query and creating plan...");
+                const plan = await generateQueryPlan(generatedSql, userQuery);
+                
+                displayQueryPlan(plan, generatedSql);
+
+            } catch (error) {
+                console.error("Error during plan generation:", error);
+                alert("An error occurred. Please check the console for details.");
+                handleCancelClick();
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        /**
+         * Handles click on "Looks Good, Get Answer" button.
+         */
+        function handleExecuteClick() {
+            planReviewContainer.classList.add('hidden');
+            displayResults(mockData);
+        }
+
+        /**
+         * Handles click on "Cancel" or "Start Over" button.
+         */
+        function handleCancelClick() {
+            resetUI();
+        }
+        
+        /**
+         * Resets the UI to its initial state.
+         */
+        function resetUI() {
+            planReviewContainer.classList.add('hidden');
+            resultsOutputContainer.classList.add('hidden');
+            userInputContainer.classList.remove('hidden');
+            copyFeedback.classList.add('hidden');
+        }
+
+        /**
+         * Generates the SQL from the user's natural language question.
+         */
+        async function generateSqlFromPrompt(userQuery) {
+            const prompt = `You are an expert SQL generator. Your task is to convert a natural language question into a Google BigQuery SQL query. You must only respond with the SQL query and nothing else. Do not include any explanations or markdown formatting.
+                
+            Use the following table schema for your query:
+            ${tableSchema}
+
+            Today's date is ${new Date().toISOString().slice(0, 10)}.
+            
+            Natural language question: "${userQuery}"
+            
+            SQL Query:`;
+
+            const apiUrl = '/api/generate-sql'; // Adjust this URL to your backend endpoint
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}: ${await response.text()}`);
+            
+            const result = await response.json();
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return result.candidates[0].content.parts[0].text.replace(/```sql/g, '').replace(/```/g, '').trim();
+            }
+            throw new Error("Invalid response structure from SQL generation API.");
+        }
+        
+        /**
+         * Generates a human-readable plan by analyzing the generated SQL.
+         */
+        async function generateQueryPlan(generatedSql, userQuery) {
+            const prompt = `You are a helpful AI assistant. Your job is to explain a given SQL query in simple terms for a non-technical user, based on the provided context.
+
+            CONTEXT:
+            - The user asked this question: "${userQuery}"
+            - The data is in a table with this schema: ${tableSchema}
+            - The generated SQL query to answer the question is: \`\`\`sql\n${generatedSql}\n\`\`\`
+
+            TASK:
+            Analyze the SQL query and provide a clear, structured explanation. Based on the SQL query and the table schema, identify which columns are used in the query and which are not.
+            
+            Respond with a valid JSON object that follows this exact schema. Do not include any other text or markdown formatting.`;
+
+            const planSchema = {
+                type: "OBJECT",
+                properties: {
+                    "logic": { "type": "STRING", "description": "A step-by-step explanation of what the query does." },
+                    "dataset_name": { "type": "STRING", "description": "The name of the table used." },
+                    "fields_used": {
+                        "type": "ARRAY",
+                        "description": "An array of objects for fields used in the query.",
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "field_name": { "type": "STRING" },
+                                "description": { "type": "STRING" }
+                            },
+                            "required": ["field_name", "description"]
+                        }
+                    },
+                    "other_fields": {
+                        "type": "ARRAY",
+                        "description": "An array of strings for field names NOT used in the query.",
+                        "items": { "type": "STRING" }
+                    }
+                },
+                "required": ["logic", "dataset_name", "fields_used", "other_fields"]
+            };
+
+            const apiUrl = '/api/generate-plan'
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: planSchema
+                }
+            };
+
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}: ${await response.text()}`);
+
+            const result = await response.json();
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                 // The response is a string containing JSON, so we need to parse it.
+                return JSON.parse(result.candidates[0].content.parts[0].text);
+            }
+            throw new Error("Invalid response structure from plan generation API.");
+        }
+
+        /**
+         * Toggles the visibility of the loading spinner.
+         */
+        function setLoading(isLoading, text = "Loading...") {
+            generatePlanBtn.disabled = isLoading;
+            if (isLoading) {
+                userInputContainer.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+                loadingText.textContent = text;
+            } else {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Populates the plan review section with the generated plan.
+         */
+        function displayQueryPlan(plan, sql) {
+            planLogic.textContent = plan.logic;
+            planDataset.textContent = plan.dataset_name;
+            sqlOutput.textContent = sql;
+
+            planFieldsUsed.innerHTML = '';
+            plan.fields_used.forEach(field => {
+                const tag = document.createElement('div');
+                tag.className = 'bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded-full border border-blue-300';
+                tag.textContent = `${field.field_name}`;
+                tag.title = field.description;
+                planFieldsUsed.appendChild(tag);
+            });
+            
+            planOtherFields.innerHTML = '';
+            plan.other_fields.forEach(fieldName => {
+                const tag = document.createElement('div');
+                tag.className = 'bg-gray-100 text-gray-800 text-sm font-medium px-2.5 py-1 rounded-full border border-gray-300';
+                tag.textContent = fieldName;
+                planOtherFields.appendChild(tag);
+            });
+
+            planReviewContainer.classList.remove('hidden');
+        }
+
+        /**
+         * Renders the mock data into an HTML table.
+         */
+        function displayResults(data) {
+            resultsHeader.innerHTML = '';
+            resultsBody.innerHTML = '';
+
+            const headerRow = document.createElement('tr');
+            data.headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.scope = 'col';
+                th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            resultsHeader.appendChild(headerRow);
+
+            data.rows.forEach(rowData => {
+                const row = document.createElement('tr');
+                rowData.forEach(cellData => {
+                    const td = document.createElement('td');
+                    td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700';
+                    td.textContent = cellData;
+                    row.appendChild(td);
+                });
+                resultsBody.appendChild(row);
+            });
+            
+            resultsOutputContainer.classList.remove('hidden');
+        }
+        
+        /**
+         * Copies the generated SQL to the clipboard.
+         */
+        function copySqlToClipboard() {
+            const sqlToCopy = sqlOutput.textContent;
+            if (!sqlToCopy) return;
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = sqlToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                copyFeedback.classList.remove('hidden');
+                setTimeout(() => copyFeedback.classList.add('hidden'), 2000);
+            } catch (err) {
+                console.error('Failed to copy SQL: ', err);
+                alert('Failed to copy SQL. Please copy it manually.');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+    </script>
+</body>
+</html>
