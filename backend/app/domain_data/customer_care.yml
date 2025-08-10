@@ -1,0 +1,69 @@
+name: customer_care
+description: Support tickets, user issues, and customer service metrics
+tables:
+  support_tickets:
+    - name: ticket_id
+      type: STRING
+      description: Unique ticket identifier
+      semantic_role: primary_key
+    - name: user_id
+      type: INTEGER
+      description: User who created the ticket
+      semantic_role: foreign_key
+    - name: created_date
+      type: TIMESTAMP
+      description: Ticket creation timestamp
+      semantic_role: date
+    - name: resolved_date
+      type: TIMESTAMP
+      description: Ticket resolution timestamp (null if unresolved)
+      semantic_role: date
+    - name: category
+      type: STRING
+      description: Issue category (billing, technical, account, etc.)
+      semantic_role: dimension
+    - name: priority
+      type: STRING
+      description: Ticket priority (low, medium, high, urgent)
+      semantic_role: dimension
+    - name: status
+      type: STRING
+      description: Current status (open, in_progress, resolved, closed)
+      semantic_role: dimension
+    - name: satisfaction_rating
+      type: INTEGER
+      description: Customer satisfaction rating (1-5, null if not rated)
+      semantic_role: metric
+  agent_responses:
+    - name: response_id
+      type: STRING
+      description: Unique response identifier
+      semantic_role: primary_key
+    - name: ticket_id
+      type: STRING
+      description: Associated ticket ID
+      semantic_role: foreign_key
+    - name: agent_id
+      type: INTEGER
+      description: Support agent who responded
+      semantic_role: foreign_key
+    - name: response_date
+      type: TIMESTAMP
+      description: When the response was sent
+      semantic_role: date
+    - name: response_time_minutes
+      type: INTEGER
+      description: Minutes from ticket creation/last customer message
+      semantic_role: metric
+joins:
+  - table: agent_responses
+    condition: support_tickets.ticket_id = agent_responses.ticket_id
+    type: LEFT
+caveats:
+  - "Response times exclude weekends and holidays"
+  - "Satisfaction ratings only collected for resolved tickets"
+  - "Some legacy tickets may have incomplete category data"
+sample_questions:
+  - "What is the average resolution time for high priority tickets?"
+  - "How many billing issues were created last week?"
+  - "What is the customer satisfaction score by agent?"

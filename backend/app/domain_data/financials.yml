@@ -1,0 +1,65 @@
+name: financials
+description: Revenue, transactions, and financial metrics
+tables:
+  transactions:
+    - name: transaction_id
+      type: STRING
+      description: Unique transaction identifier
+      semantic_role: primary_key
+    - name: user_id
+      type: INTEGER  
+      description: User who made the transaction
+      semantic_role: foreign_key
+    - name: amount
+      type: DECIMAL
+      description: Transaction amount in USD
+      semantic_role: metric
+    - name: transaction_date
+      type: TIMESTAMP
+      description: When the transaction occurred
+      semantic_role: date
+    - name: transaction_type
+      type: STRING
+      description: Type of transaction (purchase, refund, etc.)
+      semantic_role: dimension
+    - name: product_category
+      type: STRING
+      description: Product category purchased
+      semantic_role: dimension
+  subscriptions:
+    - name: subscription_id
+      type: STRING
+      description: Unique subscription identifier
+      semantic_role: primary_key
+    - name: user_id
+      type: INTEGER
+      description: Subscriber user ID
+      semantic_role: foreign_key
+    - name: plan_type
+      type: STRING
+      description: Subscription plan (basic, premium, enterprise)
+      semantic_role: dimension
+    - name: monthly_fee
+      type: DECIMAL
+      description: Monthly subscription fee
+      semantic_role: metric
+    - name: start_date
+      type: TIMESTAMP
+      description: Subscription start date
+      semantic_role: date
+    - name: end_date
+      type: TIMESTAMP
+      description: Subscription end date (null for active)
+      semantic_role: date
+joins:
+  - table: subscriptions
+    condition: transactions.user_id = subscriptions.user_id
+    type: LEFT
+caveats:
+  - "Refunds appear as negative amounts"
+  - "Revenue recognition follows monthly subscription cycles" 
+  - "International transactions converted to USD at transaction time"
+sample_questions:
+  - "What was the total revenue last quarter?"
+  - "How many new premium subscriptions started this month?"
+  - "What is the average transaction amount by product category?"

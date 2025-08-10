@@ -1,0 +1,57 @@
+name: reads
+description: User engagement and content consumption data
+tables:
+  users:
+    - name: user_id
+      type: INTEGER
+      description: Unique identifier for the user
+      semantic_role: primary_key
+    - name: email 
+      type: STRING
+      description: User's email address
+      semantic_role: identifier
+    - name: country_code
+      type: STRING
+      description: Two-letter country code
+      semantic_role: dimension
+    - name: signup_date
+      type: TIMESTAMP
+      description: User registration timestamp
+      semantic_role: date
+    - name: last_login
+      type: TIMESTAMP
+      description: Most recent login timestamp
+      semantic_role: date
+  content:
+    - name: content_id
+      type: INTEGER
+      description: Unique content identifier
+      semantic_role: primary_key
+    - name: user_id
+      type: INTEGER
+      description: Content author user ID
+      semantic_role: foreign_key
+    - name: title
+      type: STRING
+      description: Content title
+      semantic_role: text
+    - name: published_date
+      type: TIMESTAMP
+      description: Content publication date
+      semantic_role: date
+    - name: view_count
+      type: INTEGER
+      description: Number of views
+      semantic_role: metric
+joins:
+  - table: content
+    condition: users.user_id = content.user_id
+    type: LEFT
+caveats:
+  - "View counts may be delayed by up to 1 hour"
+  - "Deleted users are soft-deleted, check status field"
+  - "Country codes follow ISO 3166-1 alpha-2 standard"
+sample_questions:
+  - "How many users signed up from the USA last month?"
+  - "What is the average view count per user?"
+  - "Which countries have the most active content creators?"
