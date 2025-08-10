@@ -1,0 +1,46 @@
+# .dockerignore
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Git
+.git/
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Test and build artifacts
+.coverage
+.pytest_cache/
+dist/
+build/
+
+# Node.js (legacy)
+node_modules/
+package.json
+package-lock.json
+
+# Scripts (not needed in container)
+scripts/
+
+# Documentation
+README.md
+
+# Lock file (using requirements.txt instead)
+requirements.lock
