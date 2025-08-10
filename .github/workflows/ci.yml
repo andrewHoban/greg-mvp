@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    - name: Install project
+      run: poetry install --no-interaction
+
+    - name: Run linting with Ruff
+      run: poetry run ruff check backend/ tests/
+
+    - name: Run type checking with MyPy
+      run: poetry run mypy backend/ tests/
+
+    - name: Run tests with pytest
+      run: |
+        poetry run pytest tests/ -v --tb=short
+
+    - name: Test FastAPI app can start
+      run: |
+        poetry run python -c "from backend.app.main import app; print('✅ FastAPI app can be imported successfully')"
+        timeout 30 poetry run uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 5
+        curl -f http://localhost:8000/api/health || exit 1
+        curl -f http://localhost:8000/docs || exit 1
+        echo "✅ FastAPI app started and endpoints are accessible"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t greg-mvp:latest .
+
+    - name: Test Docker image
+      run: |
+        docker run -d --name test-app -p 8000:8000 greg-mvp:latest
+        sleep 10
+        curl -f http://localhost:8000/api/health || exit 1
+        docker stop test-app
+        docker rm test-app
+        echo "✅ Docker image built and tested successfully"

@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "greg-mvp"
+version = "0.1.0"
+description = "AI Product Manager Assistant - FastAPI MVP"
+authors = ["Greg MVP Team"]
+readme = "README.md"
+packages = [{include = "backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.116.1"
+uvicorn = {extras = ["standard"], version = "^0.35.0"}
+pydantic = "^2.11.7"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.8"
+mypy = "^1.17.1"
+pytest = "^8.4.1"
+httpx = "^0.28.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "A", "COM", "C4", "T10", "EXE", "FA", "ISC", "ICN", "PIE", "T20", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PL", "TRY", "FLY", "NPY", "PERF", "FURB", "RUF"]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D105"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "PLR2004"]  # Allow asserts and magic numbers in tests
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+show_error_codes = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+pythonpath = ["."]
+

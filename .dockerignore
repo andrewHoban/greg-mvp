@@ -1,13 +1,12 @@
-# .gitignore
-
-# Node dependencies
-node_modules/
+# Git
+.git
+.gitignore
 
 # Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
+__pycache__
+*.pyc
+*.pyo
+*.pyd
 .Python
 build/
 develop-eggs/
@@ -24,41 +23,34 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Poetry
 .venv/
-poetry.lock
 
-# Testing
+# Testing and development
 .pytest_cache/
 .coverage
-htmlcov/
-.tox/
-.coverage.*
-
-# MyPy
 .mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Ruff
 .ruff_cache/
 
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*.local
 
-# Log files
-*.log
+# Legacy files
+legacy/
 
-# OS-specific files
-.DS_Store
-Thumbs.db
+# Documentation
+*.md
+docs/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# OS
+.DS_Store
+Thumbs.db
