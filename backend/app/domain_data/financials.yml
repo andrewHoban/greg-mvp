@@ -1,0 +1,99 @@
+name: "financials"
+description: "Financial data including transactions, revenue, and business metrics"
+
+tables:
+  transactions:
+    description: "Transaction records and payment data"
+    fields:
+      - name: "transaction_id"
+        type: "STRING"
+        description: "Unique transaction identifier"
+        example_values: ["txn_001", "txn_002"]
+      - name: "customer_id"
+        type: "STRING"
+        description: "Customer who made the transaction"
+      - name: "amount"
+        type: "FLOAT64"
+        description: "Transaction amount in USD"
+      - name: "transaction_date"
+        type: "DATE"
+        description: "Date of the transaction"
+      - name: "transaction_type"
+        type: "STRING"
+        description: "Type of transaction"
+        example_values: ["purchase", "refund", "subscription"]
+      - name: "payment_method"
+        type: "STRING"
+        description: "Payment method used"
+        example_values: ["credit_card", "paypal", "bank_transfer"]
+      - name: "status"
+        type: "STRING"
+        description: "Transaction status"
+        example_values: ["completed", "pending", "failed"]
+
+  revenue_summary:
+    description: "Aggregated revenue data by time periods"
+    fields:
+      - name: "period"
+        type: "DATE"
+        description: "Revenue period (monthly)"
+      - name: "total_revenue"
+        type: "FLOAT64"
+        description: "Total revenue for the period"
+      - name: "transaction_count"
+        type: "INTEGER"
+        description: "Number of transactions in the period"
+      - name: "avg_transaction_value"
+        type: "FLOAT64"
+        description: "Average transaction value"
+      - name: "unique_customers"
+        type: "INTEGER"
+        description: "Number of unique customers"
+
+  subscription_metrics:
+    description: "Subscription and recurring revenue data"
+    fields:
+      - name: "subscription_id"
+        type: "STRING"
+        description: "Unique subscription identifier"
+      - name: "customer_id"
+        type: "STRING"
+        description: "Customer with the subscription"
+      - name: "plan_type"
+        type: "STRING"
+        description: "Subscription plan type"
+        example_values: ["basic", "premium", "enterprise"]
+      - name: "monthly_value"
+        type: "FLOAT64"
+        description: "Monthly subscription value"
+      - name: "start_date"
+        type: "DATE"
+        description: "Subscription start date"
+      - name: "end_date"
+        type: "DATE"
+        description: "Subscription end date"
+        nullable: true
+
+joins:
+  - target_table: "revenue_summary"
+    join_condition: "DATE_TRUNC('month', transactions.transaction_date) = revenue_summary.period"
+    join_type: "LEFT"
+    description: "Join transactions with monthly revenue summaries"
+
+common_questions:
+  - "What's our monthly revenue trend?"
+  - "How many transactions do we process per day?"
+  - "What's the average transaction value?"
+  - "Which payment methods are most popular?"
+  - "What's our monthly recurring revenue (MRR)?"
+
+caveats:
+  - "Revenue data is in USD and not adjusted for currency fluctuations"
+  - "Refunds are recorded as negative amounts"
+  - "Subscription metrics only include active subscriptions"
+  - "Revenue recognition follows accrual accounting principles"
+
+sample_queries:
+  - "SELECT DATE_TRUNC('month', transaction_date) as month, SUM(amount) as revenue FROM transactions WHERE status = 'completed' GROUP BY month ORDER BY month"
+  - "SELECT AVG(amount) as avg_transaction FROM transactions WHERE status = 'completed' AND transaction_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)"
+  - "SELECT COUNT(*) as daily_transactions FROM transactions WHERE transaction_date = CURRENT_DATE()"

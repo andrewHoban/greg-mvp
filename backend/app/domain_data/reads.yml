@@ -1,0 +1,66 @@
+name: "reads"
+description: "Product engagement and user interaction data"
+
+tables:
+  user_sessions:
+    description: "User session tracking data"
+    fields:
+      - name: "session_id"
+        type: "STRING"
+        description: "Unique session identifier"
+        example_values: ["sess_123", "sess_456"]
+      - name: "user_id"
+        type: "STRING"
+        description: "User identifier"
+        example_values: ["user_abc", "user_def"]
+      - name: "start_time"
+        type: "TIMESTAMP"
+        description: "Session start timestamp"
+      - name: "end_time"
+        type: "TIMESTAMP"
+        description: "Session end timestamp"
+        nullable: true
+      - name: "page_views"
+        type: "INTEGER"
+        description: "Number of pages viewed in session"
+    
+  content_engagement:
+    description: "Content interaction and engagement metrics"
+    fields:
+      - name: "content_id"
+        type: "STRING"
+        description: "Unique content identifier"
+      - name: "user_id"
+        type: "STRING"
+        description: "User who engaged with content"
+      - name: "engagement_type"
+        type: "STRING"
+        description: "Type of engagement"
+        example_values: ["view", "like", "share", "comment"]
+      - name: "engagement_time"
+        type: "TIMESTAMP"
+        description: "When the engagement occurred"
+      - name: "duration_seconds"
+        type: "INTEGER"
+        description: "Duration of engagement in seconds"
+
+joins:
+  - target_table: "content_engagement"
+    join_condition: "user_sessions.user_id = content_engagement.user_id"
+    join_type: "LEFT"
+    description: "Join sessions with content engagement data"
+
+common_questions:
+  - "How many active users do we have this month?"
+  - "What's the average session duration?"
+  - "Which content gets the most engagement?"
+  - "How many page views per session on average?"
+
+caveats:
+  - "Session data may have gaps during maintenance windows"
+  - "Content engagement tracking was implemented in Q2 2023"
+  - "Mobile app sessions are tracked separately"
+
+sample_queries:
+  - "SELECT COUNT(DISTINCT user_id) as active_users FROM user_sessions WHERE start_time >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)"
+  - "SELECT AVG(TIMESTAMP_DIFF(end_time, start_time, SECOND)) as avg_duration FROM user_sessions WHERE end_time IS NOT NULL"

@@ -1,0 +1,117 @@
+name: "customer_care"
+description: "Customer support tickets, interactions, and satisfaction data"
+
+tables:
+  support_tickets:
+    description: "Customer support ticket records"
+    fields:
+      - name: "ticket_id"
+        type: "STRING"
+        description: "Unique support ticket identifier"
+        example_values: ["TKT-001", "TKT-002"]
+      - name: "customer_id"
+        type: "STRING"
+        description: "Customer who submitted the ticket"
+      - name: "subject"
+        type: "STRING"
+        description: "Ticket subject line"
+      - name: "priority"
+        type: "STRING"
+        description: "Ticket priority level"
+        example_values: ["low", "medium", "high", "urgent"]
+      - name: "category"
+        type: "STRING"
+        description: "Support category"
+        example_values: ["billing", "technical", "account", "feature_request"]
+      - name: "status"
+        type: "STRING"
+        description: "Current ticket status"
+        example_values: ["open", "in_progress", "resolved", "closed"]
+      - name: "created_date"
+        type: "TIMESTAMP"
+        description: "When the ticket was created"
+      - name: "resolved_date"
+        type: "TIMESTAMP"
+        description: "When the ticket was resolved"
+        nullable: true
+      - name: "assigned_agent"
+        type: "STRING"
+        description: "Support agent assigned to ticket"
+
+  customer_interactions:
+    description: "Customer interaction history across all channels"
+    fields:
+      - name: "interaction_id"
+        type: "STRING"
+        description: "Unique interaction identifier"
+      - name: "customer_id"
+        type: "STRING"
+        description: "Customer involved in interaction"
+      - name: "channel"
+        type: "STRING"
+        description: "Communication channel"
+        example_values: ["email", "chat", "phone", "self_service"]
+      - name: "interaction_date"
+        type: "TIMESTAMP"
+        description: "When the interaction occurred"
+      - name: "duration_minutes"
+        type: "INTEGER"
+        description: "Duration of interaction in minutes"
+      - name: "resolution_type"
+        type: "STRING"
+        description: "How the interaction was resolved"
+        example_values: ["self_resolved", "agent_assisted", "escalated"]
+
+  satisfaction_surveys:
+    description: "Customer satisfaction survey responses"
+    fields:
+      - name: "survey_id"
+        type: "STRING"
+        description: "Unique survey response identifier"
+      - name: "ticket_id"
+        type: "STRING"
+        description: "Related support ticket"
+      - name: "customer_id"
+        type: "STRING"
+        description: "Customer who completed survey"
+      - name: "satisfaction_score"
+        type: "INTEGER"
+        description: "Satisfaction rating (1-5 scale)"
+      - name: "would_recommend"
+        type: "BOOLEAN"
+        description: "Whether customer would recommend service"
+      - name: "feedback_text"
+        type: "STRING"
+        description: "Optional written feedback"
+        nullable: true
+      - name: "survey_date"
+        type: "TIMESTAMP"
+        description: "When survey was completed"
+
+joins:
+  - target_table: "customer_interactions"
+    join_condition: "support_tickets.customer_id = customer_interactions.customer_id"
+    join_type: "LEFT"
+    description: "Join tickets with customer interaction history"
+  - target_table: "satisfaction_surveys"
+    join_condition: "support_tickets.ticket_id = satisfaction_surveys.ticket_id"
+    join_type: "LEFT"
+    description: "Join tickets with satisfaction survey data"
+
+common_questions:
+  - "What's our average ticket resolution time?"
+  - "How many open tickets do we have by priority?"
+  - "What's the most common support category?"
+  - "What's our customer satisfaction score?"
+  - "Which agents have the best resolution rates?"
+
+caveats:
+  - "Satisfaction surveys are only sent for resolved tickets"
+  - "Response rate for surveys is approximately 15-20%"
+  - "Phone interaction durations may include hold time"
+  - "Some legacy tickets may have incomplete data"
+
+sample_queries:
+  - "SELECT category, COUNT(*) as ticket_count FROM support_tickets WHERE status = 'open' GROUP BY category ORDER BY ticket_count DESC"
+  - "SELECT AVG(satisfaction_score) as avg_satisfaction FROM satisfaction_surveys WHERE survey_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)"
+  - "SELECT AVG(TIMESTAMP_DIFF(resolved_date, created_date, HOUR)) as avg_resolution_hours FROM support_tickets WHERE resolved_date IS NOT NULL"
