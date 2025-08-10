@@ -1,5 +1,6 @@
-from loguru import logger
 import sys
+
+from loguru import logger
 
 
 def setup_loguru():
@@ -10,8 +11,11 @@ def setup_loguru():
     # Add new handler with ISO timestamp format
     logger.add(
         sys.stdout,
-        format="{time:YYYY-MM-DDTHH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",
-        level="INFO"
+        format=(
+            "{time:YYYY-MM-DDTHH:mm:ss.SSS} | {level: <8} | "
+            "{name}:{function}:{line} - {message}"
+        ),
+        level="INFO",
     )
     
     return logger

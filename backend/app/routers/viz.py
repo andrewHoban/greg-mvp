@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from backend.app.services.viz_suggester import VizSuggester
+
 from backend.app.models.query_models import VisualizationRequest, VisualizationSuggestion
+from backend.app.services.viz_suggester import VizSuggester
 
 router = APIRouter(prefix="/viz")
 

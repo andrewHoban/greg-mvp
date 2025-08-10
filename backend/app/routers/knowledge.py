@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from backend.app.dependencies import get_knowledge_base
 from backend.app.services.knowledge_base import KnowledgeBase
 

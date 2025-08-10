@@ -1,6 +1,7 @@
-import yaml
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
+import yaml
 
 
 class KnowledgeBase:
@@ -32,7 +33,7 @@ class KnowledgeBase:
         for yaml_file in self.domain_data_path.glob("*.yml"):
             domain_name = yaml_file.stem
             try:
-                with open(yaml_file, 'r') as f:
+                with open(yaml_file) as f:
                     domain_data = yaml.safe_load(f)
                     self._domains[domain_name] = domain_data
             except Exception as e:

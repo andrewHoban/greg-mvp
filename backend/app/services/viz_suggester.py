@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 
 class VizSuggester:
@@ -24,7 +24,10 @@ class VizSuggester:
         if any(word in ' '.join(field_names_lower) for word in ['date', 'time', 'month', 'day']):
             suggested_types.extend(["line", "bar"])
         
-        if any(word in ' '.join(field_names_lower) for word in ['count', 'total', 'amount', 'revenue']):
+        if any(
+            word in " ".join(field_names_lower)
+            for word in ["count", "total", "amount", "revenue"]
+        ):
             suggested_types.extend(["bar", "pie"])
         
         if any(word in ' '.join(field_names_lower) for word in ['country', 'region', 'category']):

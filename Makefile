@@ -10,7 +10,7 @@ dev:
 	poetry run uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 
 lint:
-	poetry run ruff check .
+	poetry run ruff check . --extend-ignore=B008
 	poetry run mypy backend/
 
 format:
@@ -22,7 +22,7 @@ test:
 	poetry run pytest -v
 
 check:
-	poetry run ruff check .
+	poetry run ruff check . --extend-ignore=B008
 	poetry run mypy backend/
 	poetry run pytest -v
 

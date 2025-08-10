@@ -1,8 +1,14 @@
 from fastapi import APIRouter, Depends
+
 from backend.app.dependencies import get_nl_sql_pipeline, get_sql_executor
+from backend.app.models.query_models import (
+    ExecuteQueryRequest,
+    ExecuteQueryResponse,
+    NLQueryRequest,
+    ProposedQueryResponse,
+)
 from backend.app.services.nl_sql_pipeline import NLToSQLPipeline
 from backend.app.services.sql_executor import SQLExecutor
-from backend.app.models.query_models import NLQueryRequest, ExecuteQueryRequest, ProposedQueryResponse, ExecuteQueryResponse
 
 router = APIRouter(prefix="/query")
 

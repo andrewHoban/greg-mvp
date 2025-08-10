@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-from backend.app.routers import health, knowledge, query, viz
-from backend.app.logging import setup_loguru
+
 from backend.app.dependencies import get_settings
+from backend.app.logging import setup_loguru
+from backend.app.routers import health, knowledge, query, viz
 
 # Setup logging
 logger = setup_loguru()
