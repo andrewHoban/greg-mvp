@@ -1,0 +1,5 @@
+tables:
+  - name: sales
+    columns: [id, amount, created_at, region]
+  - name: customers
+    columns: [id, name, segment, created_at]

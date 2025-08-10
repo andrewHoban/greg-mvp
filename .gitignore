@@ -1,14 +1,11 @@
-# .gitignore
-
-# Node dependencies
-node_modules/
-
-# Environment variables
+# Python
+__pycache__/
+*.pyc
+.poetry/
+.cache/
+.mypy_cache/
+ruff_cache/
 .env
 
-# Log files
-*.log
-
-# OS-specific files
-.DS_Store
-Thumbs.db
+# VSCode
+.vscode/
