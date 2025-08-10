@@ -1,0 +1,94 @@
+name: customer_care
+description: Placeholder domain for customer service interactions, support tickets, and care operations.
+
+tables:
+  - name: customer_care_tickets
+    description: Customer service tickets and support interactions
+    fields:
+      - name: ticket_id
+        type: STRING
+        description: Unique identifier for each support ticket
+        semantic_role: key
+      - name: customer_account_id
+        type: STRING
+        description: Customer account identifier
+        semantic_role: key
+      - name: issue_category
+        type: STRING
+        description: Primary category of the issue (billing, outage, connection, general)
+        semantic_role: dimension
+      - name: issue_subcategory
+        type: STRING
+        description: Specific subcategory within the main category
+        semantic_role: dimension
+      - name: priority_level
+        type: STRING
+        description: Priority level (low, medium, high, urgent)
+        semantic_role: dimension
+      - name: status
+        type: STRING
+        description: Current ticket status (open, in_progress, pending_customer, closed)
+        semantic_role: dimension
+      - name: created_at
+        type: TIMESTAMP
+        description: When the ticket was first created
+        semantic_role: dimension
+      - name: resolved_at
+        type: TIMESTAMP
+        description: When the ticket was resolved (null if still open)
+        semantic_role: dimension
+      - name: assigned_agent_id
+        type: STRING
+        description: ID of the customer service agent assigned to the ticket
+        semantic_role: dimension
+      - name: channel
+        type: STRING
+        description: How the customer contacted us (phone, email, web, chat)
+        semantic_role: dimension
+
+  - name: customer_care_agents
+    description: Customer service agents and their information
+    fields:
+      - name: agent_id
+        type: STRING
+        description: Unique identifier for each customer service agent
+        semantic_role: key
+      - name: agent_name
+        type: STRING
+        description: Full name of the agent
+        semantic_role: dimension
+      - name: team
+        type: STRING
+        description: Team or department the agent belongs to
+        semantic_role: dimension
+      - name: specialization
+        type: STRING
+        description: Agent's area of specialization
+        semantic_role: dimension
+      - name: hire_date
+        type: DATE
+        description: When the agent was hired
+        semantic_role: dimension
+
+joins:
+  - target: financials_transactions
+    condition: customer_care_tickets.customer_account_id = financials_transactions.account_id
+    type: left
+    description: Link customer service tickets to financial account information.
+  - target: reads_events
+    condition: customer_care_tickets.customer_account_id = reads_events.account_id
+    type: left
+    description: Link customer service interactions to utility usage data.
+
+caveats:
+  - Some tickets may be created without a linked customer account (e.g., general inquiries).
+  - Resolution times may vary significantly based on issue complexity.
+  - Historical data may have different categorization schemes.
+  - Agent assignments may change during ticket lifecycle.
+
+sample_questions:
+  - How many open tickets do we currently have?
+  - What are the most common issue categories?
+  - Which agents have the highest ticket resolution rates?
+  - Show average resolution time by priority level.
+  - How many billing-related tickets were opened last month?

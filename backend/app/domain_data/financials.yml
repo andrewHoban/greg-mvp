@@ -1,0 +1,84 @@
+name: financials
+description: Placeholder domain for financial transactions, billing, and revenue data.
+
+tables:
+  - name: financials_transactions
+    description: All financial transactions including billing, payments, and adjustments
+    fields:
+      - name: transaction_id
+        type: STRING
+        description: Unique identifier for each financial transaction
+        semantic_role: key
+      - name: account_id
+        type: STRING
+        description: Customer account identifier
+        semantic_role: key
+      - name: amount
+        type: NUMERIC
+        description: Transaction amount (positive for charges, negative for credits)
+        semantic_role: metric
+      - name: transaction_type
+        type: STRING
+        description: Type of transaction (charge, payment, adjustment, refund)
+        semantic_role: dimension
+      - name: created_at
+        type: TIMESTAMP
+        description: Timestamp when the transaction was created
+        semantic_role: dimension
+      - name: billing_period_start
+        type: DATE
+        description: Start date of the billing period for this transaction
+        semantic_role: dimension
+      - name: billing_period_end
+        type: DATE
+        description: End date of the billing period for this transaction
+        semantic_role: dimension
+      - name: status
+        type: STRING
+        description: Transaction status (pending, processed, cancelled)
+        semantic_role: dimension
+
+  - name: financials_billing_summary
+    description: Monthly billing summaries aggregated by account
+    fields:
+      - name: account_id
+        type: STRING
+        description: Customer account identifier
+        semantic_role: key
+      - name: billing_month
+        type: DATE
+        description: First day of the billing month
+        semantic_role: dimension
+      - name: total_charges
+        type: NUMERIC
+        description: Total charges for the billing period
+        semantic_role: metric
+      - name: total_payments
+        type: NUMERIC
+        description: Total payments received for the billing period
+        semantic_role: metric
+      - name: outstanding_balance
+        type: NUMERIC
+        description: Outstanding balance after payments
+        semantic_role: metric
+
+joins:
+  - target: reads_events
+    condition: financials_transactions.account_id = reads_events.account_id
+    type: left
+    description: Link financial data to energy consumption data by account.
+  - target: customer_care_tickets
+    condition: financials_transactions.account_id = customer_care_tickets.customer_account_id
+    type: left
+    description: Link financial transactions to customer service interactions.
+
+caveats:
+  - Some historical transactions may have been migrated from legacy systems with different data structures.
+  - Billing periods may vary for different account types.
+  - Refunds and adjustments can create negative amounts.
+
+sample_questions:
+  - What is the total revenue for the last quarter?
+  - Which accounts have the highest outstanding balances?
+  - Show monthly revenue trends over the past year.
+  - What is the average transaction amount by type?

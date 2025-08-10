@@ -1,0 +1,48 @@
+name: reads
+description: Placeholder domain for energy reads and meter data.
+
+tables:
+  - name: reads_events
+    description: Raw meter read events from utility infrastructure
+    fields:
+      - name: account_id
+        type: STRING
+        description: Account identifier linking to customer accounts
+        semantic_role: key
+      - name: meter_id
+        type: STRING
+        description: Unique meter hardware identifier
+        semantic_role: key
+      - name: read_value
+        type: NUMERIC
+        description: Meter read value in kWh (kilowatt hours)
+        semantic_role: metric
+      - name: read_timestamp
+        type: TIMESTAMP
+        description: Exact time when the meter reading was captured
+        semantic_role: dimension
+      - name: read_type
+        type: STRING
+        description: Type of read (actual, estimated, customer_submitted)
+        semantic_role: dimension
+      - name: quality_flag
+        type: STRING
+        description: Data quality indicator (good, questionable, estimated)
+        semantic_role: dimension
+
+joins:
+  - target: financials_transactions
+    condition: reads_events.account_id = financials_transactions.account_id
+    type: left
+    description: Link reads to transactions by account to analyze consumption vs billing.
+
+caveats:
+  - Some reads are estimated when actual meter data is unavailable.
+  - Meter replacement events may cause discontinuities in read values.
+  - Historical data may have different quality standards.
+
+sample_questions:
+  - What is the average read value per month?
+  - Which accounts have the highest energy consumption?
+  - How many estimated vs actual reads do we have?
+  - Show energy consumption trends over the past year.
