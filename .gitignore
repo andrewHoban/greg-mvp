@@ -1,14 +1,17 @@
-# .gitignore
-
-# Node dependencies
-node_modules/
-
-# Environment variables
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 .env
-
-# Log files
+.env.*
+# Node
+node_modules/
+.next/
+dist/
 *.log
-
-# OS-specific files
+# General
 .DS_Store
-Thumbs.db
+.vscode/
+.idea/
+coverage/

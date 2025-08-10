@@ -1,38 +1,74 @@
-# AI Product Manager Assistant
+# MVP Data Interrogation Tool
 
-This is a Proof of Concept for an AI-powered assistant that helps product managers query data using natural language.
+An internal MVP for Product Managers to:
+- Ask natural language questions about core data domains
+- Get an explainable SQL proposal
+- Run queries (mock now, real BigQuery later)
+- Visualise results quickly
+- Draft a PRD in Markdown
 
-## Features
+## Stack
+- Frontend: Next.js (React, TypeScript)
+- Backend: FastAPI (Python 3.11)
+- Data: BigQuery (mocked for MVP)
+- Visualization: chart.js (via react-chartjs-2)
+- Knowledge base: YAML (hardcoded)
+- Future: Okta SSO, LLM provider (OpenAI/Gemini), PDF doc search
 
-* Converts natural language questions into SQL queries.
-* Presents an execution plan for user review before running.
-* Displays mock data results.
+## Quick Start (Local)
 
-## Setup and Running
+Prereqs:
+- Docker & docker-compose
+- (Optional) Python 3.11 + Node 20 if running without Docker
 
-1.  **Clone the repository:**
-    \`\`\`bash
-    git clone <your-repo-url>
-    cd your-pm-agent
-    \`\`\`
+```bash
+cp .env.example .env
+docker-compose up --build
+```
 
-2.  **Install backend dependencies:**
-    \`\`\`bash
-    cd backend
-    npm install express dotenv node-fetch@2
-    \`\`\`
+Frontend: http://localhost:3000  
+Backend docs (Swagger): http://localhost:8000/docs
 
-3.  **Create environment file:**
-    * Create a file named `.env` inside the `backend` directory.
-    * Add your Google Gemini API key to it:
-        \`\`\`
-        GEMINI_API_KEY="your_google_api_key_here"
-        \`\`\`
+## Environment Variables (.env)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| APP_ENV | runtime environment | dev |
+| LLM_PROVIDER | stub value | mock |
+| LLM_API_KEY | future use | sk-... |
+| BIGQUERY_PROJECT | future real BQ project | my-project |
+| BIGQUERY_USE_MOCK | "true" or "false" | true |
 
-4.  **Start the server:**
-    \`\`\`bash
-    node server.js
-    \`\`\`
+## Replacing Mock BigQuery
+1. Set BIGQUERY_USE_MOCK=false
+2. Add Google Application Credentials (mount JSON or use workload identity in GCP)
+3. Implement run_sql_real in services/bigquery.py
 
-5.  **Open the application:**
-    * Open your web browser and go to `http://localhost:3000`.
+## NLQ → SQL
+Currently uses hardcoded patterns. Extend in:
+`backend/app/services/nlp_to_sql.py`
+Add a real provider by implementing:
+`backend/app/services/llm/providers/base.py` (see stub)
+
+## Conversation Context
+A simple in-memory store (conversation_memory.py) for continuity. For production replace with Redis/Postgres.
+
+## PRD Drafting
+Client-side Markdown editing + preview. Future: add backend persistence & export to PDF/DOCX.
+
+## Tests
+Basic structure in `backend/tests`. Run:
+```bash
+docker exec -it mvp-backend pytest
+```
+
+## Roadmap (Next)
+1. Integrate real BigQuery
+2. Add authentication (Okta → OIDC)
+3. Swap NLQ→SQL to LLM provider (with guardrails)
+4. Persist conversation + PRD drafts (Postgres)
+5. Add doc/PDF semantic search microservice
+6. Role-based access / field masking
+7. Query cost estimation and safety checks
+
+## License
+Internal / Proprietary.
