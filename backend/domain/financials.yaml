@@ -1,0 +1,54 @@
+description: "Financial data and transactions for revenue analysis"
+
+tables:
+  financials_transactions:
+    description: "All financial transactions and revenue data"
+    columns:
+      transaction_id:
+        type: "STRING" 
+        description: "Unique identifier for each transaction"
+      created_at:
+        type: "TIMESTAMP"
+        description: "When the transaction was created"
+      amount:
+        type: "NUMERIC"
+        description: "Transaction amount in USD"
+      currency:
+        type: "STRING"
+        description: "Currency code (e.g., USD, EUR)"
+      transaction_type:
+        type: "STRING"
+        description: "Type of transaction (sale, refund, fee, etc.)"
+      customer_id:
+        type: "STRING"
+        description: "ID of the customer making the transaction"
+      product_id:
+        type: "STRING"
+        description: "ID of the product/service purchased"
+      status:
+        type: "STRING"
+        description: "Transaction status (completed, pending, failed)"
+
+  financials_revenue_summary:
+    description: "Aggregated revenue data by time periods"
+    columns:
+      period:
+        type: "DATE"
+        description: "Time period (daily, monthly, quarterly)"
+      total_revenue:
+        type: "NUMERIC"
+        description: "Total revenue for the period"
+      transaction_count:
+        type: "INTEGER"
+        description: "Number of transactions in the period"
+      avg_transaction_value:
+        type: "NUMERIC" 
+        description: "Average transaction value for the period"
+
+sample_questions:
+  - "What was our total revenue last month?"
+  - "Show me monthly revenue trends for this year"
+  - "What's the average transaction value by product?"
+  - "How many transactions were processed this quarter?"
+  - "Which products generated the most revenue?"
+  - "What's our revenue growth rate month over month?"

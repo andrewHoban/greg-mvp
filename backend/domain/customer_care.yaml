@@ -1,0 +1,60 @@
+description: "Customer support and care data for satisfaction analysis"
+
+tables:
+  customer_care_tickets:
+    description: "Customer support tickets and interactions"
+    columns:
+      ticket_id:
+        type: "STRING"
+        description: "Unique identifier for each support ticket"
+      customer_id:
+        type: "STRING"  
+        description: "ID of the customer who created the ticket"
+      created_at:
+        type: "TIMESTAMP"
+        description: "When the ticket was created"
+      resolved_at:
+        type: "TIMESTAMP"
+        description: "When the ticket was resolved (null if still open)"
+      category:
+        type: "STRING"
+        description: "Ticket category (billing, technical, general, etc.)"
+      priority:
+        type: "STRING"
+        description: "Ticket priority (low, medium, high, urgent)"
+      status:
+        type: "STRING"
+        description: "Current ticket status (open, in_progress, resolved, closed)"
+      satisfaction_score:
+        type: "NUMERIC"
+        description: "Customer satisfaction rating (1-5 scale)"
+      resolution_time_hours:
+        type: "NUMERIC"
+        description: "Time taken to resolve the ticket in hours"
+
+  customer_care_agents:
+    description: "Customer service agents and their performance metrics"
+    columns:
+      agent_id:
+        type: "STRING"
+        description: "Unique identifier for each support agent"
+      name:
+        type: "STRING"
+        description: "Agent name"
+      tickets_resolved:
+        type: "INTEGER"
+        description: "Total number of tickets resolved by this agent"
+      avg_resolution_time:
+        type: "NUMERIC"
+        description: "Average time to resolve tickets in hours"
+      avg_satisfaction:
+        type: "NUMERIC"
+        description: "Average customer satisfaction for this agent"
+
+sample_questions:
+  - "What's our average customer satisfaction score this month?"
+  - "Which customers have the most support tickets?"
+  - "How long does it take to resolve tickets on average?"
+  - "What are the most common ticket categories?"
+  - "Which agents have the highest satisfaction scores?"
+  - "How many urgent tickets are currently open?"

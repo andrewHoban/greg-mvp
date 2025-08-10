@@ -1,10 +1,59 @@
 # .gitignore
 
-# Node dependencies
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Environment variables
+# Poetry
+poetry.lock
+
+# FastAPI
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Linting/Formatting
+.ruff_cache/
+.mypy_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node dependencies (keeping existing)
+node_modules/
 
 # Log files
 *.log
@@ -12,3 +61,7 @@ node_modules/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Temporary files
+tmp/
+temp/

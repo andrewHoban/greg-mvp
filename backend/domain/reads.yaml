@@ -1,0 +1,66 @@
+description: "Content engagement and reading analytics"
+
+tables:
+  reads_content:
+    description: "Content articles and their performance metrics"
+    columns:
+      content_id:
+        type: "STRING"
+        description: "Unique identifier for each piece of content"
+      title:
+        type: "STRING"
+        description: "Title of the content"
+      author:
+        type: "STRING"
+        description: "Content author"
+      published_at:
+        type: "TIMESTAMP"
+        description: "When the content was published"
+      category:
+        type: "STRING"
+        description: "Content category (news, analysis, tutorial, etc.)"
+      read_count:
+        type: "INTEGER"
+        description: "Total number of times content was read"
+      engagement_score:
+        type: "NUMERIC"
+        description: "Engagement score (0-1 scale based on interactions)"
+      avg_read_duration:
+        type: "NUMERIC"
+        description: "Average time spent reading in seconds"
+      word_count:
+        type: "INTEGER"
+        description: "Total word count of the content"
+
+  reads_user_engagement:
+    description: "User reading behavior and engagement patterns"
+    columns:
+      user_id:
+        type: "STRING"
+        description: "Unique identifier for each user"
+      content_id:
+        type: "STRING"
+        description: "ID of the content read"
+      read_at:
+        type: "TIMESTAMP"
+        description: "When the content was read"
+      read_duration:
+        type: "NUMERIC"
+        description: "Time spent reading in seconds"
+      completion_rate:
+        type: "NUMERIC"
+        description: "Percentage of content read (0-1 scale)"
+      liked:
+        type: "BOOLEAN"
+        description: "Whether the user liked the content"
+      shared:
+        type: "BOOLEAN"
+        description: "Whether the user shared the content"
+
+sample_questions:
+  - "Which articles have the highest engagement scores?"
+  - "What's the average read duration for our content?"
+  - "Which content categories are most popular?"
+  - "How many users read our content daily?"
+  - "Which authors have the best engagement rates?"
+  - "What's the completion rate for long-form content?"
